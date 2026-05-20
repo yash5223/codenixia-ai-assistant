@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codenixia — AI Business Assistant</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  * { font-family: 'Inter', sans-serif; }
+  .dot-anim span { animation: blink 1.4s infinite; display:inline-block; }
+  .dot-anim span:nth-child(2) { animation-delay:.2s; }
+  .dot-anim span:nth-child(3) { animation-delay:.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+  #messages { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+  .msg-bubble p { white-space: pre-wrap; }
+  .active-tab { background: linear-gradient(135deg,#6366f1,#8b5cf6); color:white; }
+</style>
+</head>
+<body class="bg-[#0f0f1a] min-h-screen text-white">
+
+<div class="max-w-4xl mx-auto px-4 py-10">
+
+  <div class="text-center mb-10">
+    <div class="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 rounded-full px-4 py-1.5 text-indigo-300 text-sm mb-5">
+      <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+      AI-Powered Business Automation
+    </div>
+    <h1 class="text-5xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3">
+      Codenixia Assistant
+    </h1>
+    <p class="text-slate-400 text-lg">Intelligent automation for modern business workflows</p>
+  </div>
+
+  <div class="flex gap-2 mb-6 bg-[#1a1a2e] border border-slate-800 rounded-2xl p-1.5">
+    <button onclick="showTab('chat')" id="tab-chat" class="active-tab flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all">
+      💬 AI Chat
+    </button>
+    <button onclick="showTab('lead')" id="tab-lead" class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all text-slate-400 hover:text-white">
+      📋 Contact Us
+    </button>
+    <a href="/dashboard.html" class="flex-1 py-2.5 rounded-xl font-semibold text-sm text-slate-400 hover:text-white text-center transition-all">
+      📊 Dashboard
+    </a>
+  </div>
+
+  <div id="chat-section">
+    <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl overflow-hidden">
+      <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-800">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm font-bold">AI</div>
+        <div>
+          <p class="font-semibold text-sm">Codenixia AI</p>
+          <p class="text-xs text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>Online</p>
+        </div>
+        <div class="ml-auto text-xs text-slate-500">Powered by Groq</div>
+      </div>
+
+      <div id="messages" class="p-5 h-[420px] overflow-y-auto space-y-4">
+        <div class="flex gap-3 items-start">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</div>
+          <div class="bg-[#252540] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[82%]">
+            <p class="text-sm leading-relaxed">Hello! 👋 I'm the Codenixia AI Business Assistant. I can help you with business queries, our services, pricing, and tech solutions. What can I help you with today?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-4 border-t border-slate-800">
+        <div class="flex gap-3">
+          <input id="msg-input" type="text" placeholder="Type your message..."
+            class="flex-1 bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-500"
+            onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+          <button onclick="sendMsg()" id="send-btn"
+            class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-5 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2">
+            Send →
+          </button>
+        </div>
+        <p class="text-xs text-slate-600 mt-2 ml-1">Press Enter to send</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="lead-section" class="hidden">
+    <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-8">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-1">Get in Touch</h2>
+        <p class="text-slate-400 text-sm">Fill the form below and we'll reach out within 24 hours.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs text-slate-400 font-medium mb-1.5 block">Full Name *</label>
+          <input id="f-name" type="text" placeholder="John Doe"
+            class="w-full bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-500">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 font-medium mb-1.5 block">Email Address *</label>
+          <input id="f-email" type="email" placeholder="john@company.com"
+            class="w-full bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-500">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 font-medium mb-1.5 block">Phone Number *</label>
+          <input id="f-phone" type="tel" placeholder="+91 XXXXX XXXXX"
+            class="w-full bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-500">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 font-medium mb-1.5 block">Company</label>
+          <input id="f-company" type="text" placeholder="Your Company (optional)"
+            class="w-full bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors placeholder:text-slate-500">
+        </div>
+      </div>
+      <div class="mt-4">
+        <label class="text-xs text-slate-400 font-medium mb-1.5 block">Message</label>
+        <textarea id="f-message" rows="4" placeholder="Tell us about your project or query..."
+          class="w-full bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors resize-none placeholder:text-slate-500"></textarea>
+      </div>
+      <div id="form-msg" class="mt-3 text-sm hidden"></div>
+      <button onclick="submitLead()" id="submit-btn"
+        class="mt-5 w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 py-3.5 rounded-xl font-semibold transition-all">
+        Submit Inquiry →
+      </button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4 mt-6">
+    <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-4 text-center">
+      <p class="text-2xl mb-1">🤖</p>
+      <p class="text-xs font-semibold text-slate-300">AI Chatbot</p>
+      <p class="text-xs text-slate-500 mt-0.5">Groq Powered</p>
+    </div>
+    <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-4 text-center">
+      <p class="text-2xl mb-1">⚡</p>
+      <p class="text-xs font-semibold text-slate-300">Automation</p>
+      <p class="text-xs text-slate-500 mt-0.5">Email Workflows</p>
+    </div>
+    <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-4 text-center">
+      <p class="text-2xl mb-1">📊</p>
+      <p class="text-xs font-semibold text-slate-300">Dashboard</p>
+      <p class="text-xs text-slate-500 mt-0.5">Real-time Data</p>
+    </div>
+  </div>
+</div>
+
+<script>
+let history = [];
+
+function showTab(tab) {
+  const isChat = tab === 'chat';
+  document.getElementById('chat-section').classList.toggle('hidden', !isChat);
+  document.getElementById('lead-section').classList.toggle('hidden', isChat);
+  document.getElementById('tab-chat').className = `flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all ${isChat ? 'active-tab' : 'text-slate-400 hover:text-white'}`;
+  document.getElementById('tab-lead').className = `flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all ${!isChat ? 'active-tab' : 'text-slate-400 hover:text-white'}`;
+}
+
+function appendMsg(role, text) {
+  const box = document.getElementById('messages');
+  const isUser = role === 'user';
+  const el = document.createElement('div');
+  el.className = `flex gap-3 items-start ${isUser ? 'justify-end' : ''}`;
+  el.innerHTML = `
+    ${!isUser ? '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</div>' : ''}
+    <div class="${isUser ? 'bg-gradient-to-br from-indigo-600 to-purple-600' : 'bg-[#252540]'} rounded-2xl ${isUser ? 'rounded-tr-sm' : 'rounded-tl-sm'} px-4 py-3 max-w-[82%] msg-bubble">
+      <p class="text-sm leading-relaxed">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+    </div>
+    ${isUser ? '<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">You</div>' : ''}`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  return el;
+}
+
+function showTyping() {
+  const box = document.getElementById('messages');
+  const el = document.createElement('div');
+  el.id = 'typing-indicator';
+  el.className = 'flex gap-3 items-start';
+  el.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">AI</div>
+    <div class="bg-[#252540] rounded-2xl rounded-tl-sm px-4 py-3 dot-anim">
+      <span class="text-slate-300 text-lg">•</span><span class="text-slate-300 text-lg">•</span><span class="text-slate-300 text-lg">•</span>
+    </div>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMsg() {
+  const input = document.getElementById('msg-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  document.getElementById('send-btn').disabled = true;
+  appendMsg('user', msg);
+  showTyping();
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: msg, history})
+    });
+    const data = await res.json();
+    document.getElementById('typing-indicator')?.remove();
+    history.push({role:'user',content:msg});
+    history.push({role:'assistant',content:data.reply});
+    appendMsg('assistant', data.reply);
+  } catch {
+    document.getElementById('typing-indicator')?.remove();
+    appendMsg('assistant', 'Sorry, I encountered an error. Please try again.');
+  }
+  document.getElementById('send-btn').disabled = false;
+  input.focus();
+}
+
+async function submitLead() {
+  const get = id => document.getElementById(id).value.trim();
+  const [name, email, phone] = [get('f-name'), get('f-email'), get('f-phone')];
+  const msgEl = document.getElementById('form-msg');
+  if (!name || !email || !phone) {
+    msgEl.className = 'mt-3 text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-2';
+    msgEl.textContent = '⚠ Please fill in all required fields (Name, Email, Phone).';
+    return;
+  }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  try {
+    const res = await fetch('/api/leads', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name, email, phone, company: get('f-company'), message: get('f-message')})
+    });
+    const data = await res.json();
+    msgEl.className = 'mt-3 text-sm text-emerald-400 bg-emerald-400/10 rounded-xl px-4 py-2';
+    msgEl.textContent = '✓ ' + data.msg;
+    ['f-name','f-email','f-phone','f-company','f-message'].forEach(id => document.getElementById(id).value = '');
+  } catch {
+    msgEl.className = 'mt-3 text-sm text-red-400 bg-red-400/10 rounded-xl px-4 py-2';
+    msgEl.textContent = 'Submission failed. Please try again.';
+  }
+  msgEl.classList.remove('hidden');
+  btn.disabled = false;
+  btn.textContent = 'Submit Inquiry →';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Codenixia</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  * { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body class="bg-[#0f0f1a] min-h-screen text-white">
+
+<div id="auth" class="min-h-screen flex items-center justify-center">
+  <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-10 w-[360px] text-center">
+    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl mx-auto mb-5">🔐</div>
+    <h2 class="text-2xl font-bold mb-1">Admin Access</h2>
+    <p class="text-slate-400 text-sm mb-6">Enter your password to continue</p>
+    <input id="pwd" type="password" placeholder="Password"
+      class="w-full bg-[#252540] border border-slate-700 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus:border-indigo-500 transition-colors text-center tracking-widest"
+      onkeypress="if(event.key==='Enter') login()">
+    <button onclick="login()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 py-3 rounded-xl font-semibold text-sm transition-all">
+      Access Dashboard
+    </button>
+    <p id="auth-err" class="text-red-400 text-sm mt-3 hidden">Incorrect password. Try again.</p>
+  </div>
+</div>
+
+<div id="dashboard" class="hidden">
+  <div class="border-b border-slate-800 bg-[#0f0f1a]/80 backdrop-blur sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-sm font-bold">C</div>
+        <div>
+          <p class="font-bold text-sm">Codenixia Admin</p>
+          <p class="text-xs text-slate-500">Business Intelligence Dashboard</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="loadData()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-all">
+          ↻ Refresh
+        </button>
+        <button onclick="exportCSV()" class="bg-[#1a1a2e] hover:bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-all">
+          ↓ Export CSV
+        </button>
+        <a href="/" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-4 py-2 rounded-xl text-sm font-semibold transition-all">
+          ← Back to App
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-1">Dashboard Overview</h1>
+      <p class="text-slate-400 text-sm" id="last-updated">Loading...</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      <div class="bg-[#1a1a2e] border border-indigo-500/20 rounded-2xl p-6 hover:border-indigo-500/40 transition-all">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-lg">👥</div>
+          <span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded-lg">Total</span>
+        </div>
+        <p id="stat-leads" class="text-4xl font-bold text-indigo-400 mb-1">—</p>
+        <p class="text-slate-400 text-sm font-medium">Captured Leads</p>
+      </div>
+      <div class="bg-[#1a1a2e] border border-emerald-500/20 rounded-2xl p-6 hover:border-emerald-500/40 transition-all">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-lg">💬</div>
+          <span class="text-xs text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">Total</span>
+        </div>
+        <p id="stat-chats" class="text-4xl font-bold text-emerald-400 mb-1">—</p>
+        <p class="text-slate-400 text-sm font-medium">AI Conversations</p>
+      </div>
+      <div class="bg-[#1a1a2e] border border-purple-500/20 rounded-2xl p-6 hover:border-purple-500/40 transition-all">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-lg">📅</div>
+          <span class="text-xs text-purple-400 bg-purple-500/10 px-2 py-1 rounded-lg">Today</span>
+        </div>
+        <p id="stat-today" class="text-4xl font-bold text-purple-400 mb-1">—</p>
+        <p class="text-slate-400 text-sm font-medium">Leads Today</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+      <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-lg">✅</div>
+        <div>
+          <p class="font-semibold text-sm">Automation Active</p>
+          <p class="text-xs text-slate-400">Email notifications on new leads</p>
+        </div>
+      </div>
+      <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-lg">🤖</div>
+        <div>
+          <p class="font-semibold text-sm">AI Model: LLaMA 3.3 70B</p>
+          <p class="text-xs text-slate-400">Powered by Groq API</p>
+        </div>
+      </div>
+      <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl p-5 flex items-center gap-4">
+        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-lg">💾</div>
+        <div>
+          <p class="font-semibold text-sm">Storage: SQLite</p>
+          <p class="text-xs text-slate-400">All data persisted locally</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-[#1a1a2e] border border-slate-800 rounded-2xl overflow-hidden">
+      <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-lg">Lead Management</h2>
+          <p class="text-slate-400 text-xs mt-0.5">All captured leads from the contact form</p>
+        </div>
+        <div id="lead-count" class="text-xs text-slate-500 bg-slate-800 px-3 py-1.5 rounded-lg"></div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-[#252540]">
+            <tr class="text-slate-400 text-xs uppercase tracking-wider">
+              <th class="text-left px-6 py-3 font-semibold">#</th>
+              <th class="text-left px-6 py-3 font-semibold">Name</th>
+              <th class="text-left px-6 py-3 font-semibold">Email</th>
+              <th class="text-left px-6 py-3 font-semibold">Phone</th>
+              <th class="text-left px-6 py-3 font-semibold">Company</th>
+              <th class="text-left px-6 py-3 font-semibold">Message</th>
+              <th class="text-left px-6 py-3 font-semibold">Date</th>
+            </tr>
+          </thead>
+          <tbody id="leads-table">
+            <tr><td colspan="7" class="px-6 py-16 text-center text-slate-500">
+              <div class="text-3xl mb-2">📭</div>
+              <div>Loading leads...</div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allLeads = [];
+
+function login() {
+  if (document.getElementById('pwd').value === 'admin123') {
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    loadData();
+  } else {
+    document.getElementById('auth-err').classList.remove('hidden');
+  }
+}
+
+async function loadData() {
+  try {
+    const [stats, leads] = await Promise.all([
+      fetch('/api/stats').then(r => r.json()),
+      fetch('/api/leads').then(r => r.json())
+    ]);
+    allLeads = leads;
+    document.getElementById('stat-leads').textContent = stats.leads;
+    document.getElementById('stat-chats').textContent = stats.chats;
+    document.getElementById('stat-today').textContent = stats.today_leads;
+    document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+    document.getElementById('lead-count').textContent = leads.length + ' records';
+    renderTable(leads);
+  } catch {
+    document.getElementById('last-updated').textContent = 'Failed to load data';
+  }
+}
+
+function renderTable(leads) {
+  const tbody = document.getElementById('leads-table');
+  if (!leads.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-16 text-center text-slate-500">
+      <div class="text-3xl mb-2">📭</div><div>No leads captured yet</div>
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = leads.map((l, i) => `
+    <tr class="border-t border-slate-800/50 hover:bg-[#252540]/50 transition-colors">
+      <td class="px-6 py-4 text-slate-500 text-xs">${i + 1}</td>
+      <td class="px-6 py-4 font-semibold">${esc(l.name)}</td>
+      <td class="px-6 py-4 text-indigo-400">${esc(l.email)}</td>
+      <td class="px-6 py-4 text-slate-300">${esc(l.phone)}</td>
+      <td class="px-6 py-4 text-slate-400">${l.company ? esc(l.company) : '<span class="text-slate-600">—</span>'}</td>
+      <td class="px-6 py-4 text-slate-400 max-w-[200px] truncate" title="${esc(l.message || '')}">${l.message ? esc(l.message.slice(0, 50)) + (l.message.length > 50 ? '…' : '') : '<span class="text-slate-600">—</span>'}</td>
+      <td class="px-6 py-4 text-slate-500 text-xs whitespace-nowrap">${new Date(l.ts).toLocaleString()}</td>
+    </tr>`).join('');
+}
+
+function esc(str) {
+  return (str || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function exportCSV() {
+  if (!allLeads.length) return alert('No leads to export.');
+  const headers = ['ID','Name','Email','Phone','Company','Message','Date'];
+  const rows = allLeads.map(l => [l.id, l.name, l.email, l.phone, l.company, l.message, l.ts].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`));
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = `codenixia-leads-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>
